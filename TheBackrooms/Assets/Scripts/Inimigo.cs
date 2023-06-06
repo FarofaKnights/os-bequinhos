@@ -12,12 +12,39 @@ public class Inimigo : MonoBehaviour {
 
     public Arvore mapeamento;
 
-    public enum Estado { IndoNodo, Atacando, Parado, IndoPorta };
+    public enum Estado { IndoNodo, Atacando, Parado, IndoPorta, Esperando };
     public Estado estado = Estado.Parado;
+
+    Animator anim;
 
     public float velocidade = 5;
 
     Rigidbody rb;
+
+    public void ChangeEstado(Estado estado) {
+        if (this.estado == estado) return;
+        string oldAnim = GetEstadoAnimation(this.estado);
+
+        this.estado = estado;
+        if (oldAnim != GetEstadoAnimation(estado)) anim.SetTrigger(GetEstadoAnimation(estado));
+    }
+
+    string GetEstadoAnimation(Estado estado) {
+        switch (estado) {
+            case Estado.Parado:
+                return "Parar";
+            case Estado.Esperando:
+                return "Parar";
+            case Estado.IndoNodo:
+                return "Andar";
+            case Estado.IndoPorta:
+                return "Andar";
+            case Estado.Atacando:
+                return "Atacar";
+            default:
+                return "";
+        }
+    }
 
     void Awake() {
         instance = this;
@@ -26,6 +53,7 @@ public class Inimigo : MonoBehaviour {
 
     void Start() {
         rb = GetComponent<Rigidbody>();
+        anim = transform.GetChild(0).GetComponent<Animator>();
     }
 
     void FixedUpdate() {
@@ -42,29 +70,40 @@ public class Inimigo : MonoBehaviour {
         }
     }
 
-
     public void SearchNodo() {
         if (waypoints.Count == 0) {
             int random = GameManager.instance.GetDoor();
             if (random > -1 && mapeamento.Pesquisar(random)) {
-                estado = Estado.IndoNodo;
+                ChangeEstado(Estado.IndoNodo);
                 waypointAtual = waypoints.Peek();
             }
             else {
                 waypoints.Clear();
                 view.Clear();
-                estado = Estado.Parado;
+                ChangeEstado(Estado.Parado);
             }
         }
     }
 
+    void LerpLookAt(Vector3 focus) {
+        Vector3 relativePos = focus - transform.position;
+        Quaternion toRotation = Quaternion.LookRotation(relativePos);
+        transform.rotation = Quaternion.Lerp(transform.rotation, toRotation, velocidade * Time.fixedDeltaTime);
+    }
+
     void Walking() {
-        Vector3 direction = waypointAtual.position - transform.position;
+        Vector3 waypointPos = waypointAtual.position;
+        waypointPos.y = transform.position.y;
+
+        Vector3 direction = waypointPos - transform.position;
+        direction.y = 0;
         rb.velocity = direction.normalized * velocidade;
 
-        if (Vector3.Distance(transform.position, waypointAtual.position) < 0.1f) {
+        LerpLookAt(waypointPos);
+
+        if (Vector3.Distance(transform.position, waypointPos) < 0.5f) {
             if (estado == Estado.IndoNodo) GotToNodo();
-            else if (estado == Estado.IndoPorta) GotToPorta();
+            else if (estado == Estado.IndoPorta) StartCoroutine(GotToPorta());
 
             if (waypoints.Count == 0) EndedMovement();
         }
@@ -77,27 +116,41 @@ public class Inimigo : MonoBehaviour {
         // Se houver uma porta no nodo atual, ir até ela
         if (nodo.porta != null && !nodo.porta.coletada) {
             waypointAtual = nodo.porta.waypoint;
-            estado = Estado.IndoPorta;
+            ChangeEstado(Estado.IndoPorta);
         } else {
             RemoveWaypoint();
             if (waypoints.Count > 0) waypointAtual = waypoints.Peek();
         }
     }
 
-    void GotToPorta() {
+    IEnumerator GotToPorta() {
         waypointAtual = waypoints.Peek();
+        ChangeEstado(Estado.Esperando);
+
+        yield return new WaitForSeconds(3);
+
+        /*
+        Porta porta = waypointAtual.parent.GetComponent<Porta>();
+        porta.Coletar();
+        */
 
         // Se é o ultimo nodo
-        if (waypoints.Count == 1) RemoveWaypoint();
-        else estado = Estado.IndoNodo;
+        if (waypoints.Count == 1) {
+            RemoveWaypoint();
+            EndedMovement();
+        }
+        else ChangeEstado(Estado.IndoNodo);
     }
 
     void EndedMovement() {
-        transform.position = mapeamento.raiz.GetPosition();
+        Vector3 pos = mapeamento.raiz.GetPosition();
+        pos.y = transform.position.y;
+        transform.position = pos;
         rb.velocity = Vector3.zero;
-        estado = Estado.Parado;
+        ChangeEstado(Estado.Parado);
     }
 
+    #region WaypointRelated
     public void AddWaypoint(Transform waypoint) {
         view.Add(waypoint);
         waypoints.Enqueue(waypoint);
@@ -108,4 +161,5 @@ public class Inimigo : MonoBehaviour {
         view.Remove(t);
         return t;
     }
+    #endregion
 }
