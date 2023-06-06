@@ -12,8 +12,11 @@ public class Inimigo : MonoBehaviour {
 
     public Arvore mapeamento;
 
-    public enum Estado { IndoNodo, Atacando, Parado, IndoPorta, Esperando };
+    public enum Estado { IndoNodo, Atacando, Parado, IndoPorta, Esperando, Teleportando };
     public Estado estado = Estado.Parado;
+
+    IsInCamera isInimigoInCamera;
+    public IsInCamera isSpawnInCamera;
 
     Animator anim;
 
@@ -32,11 +35,10 @@ public class Inimigo : MonoBehaviour {
     string GetEstadoAnimation(Estado estado) {
         switch (estado) {
             case Estado.Parado:
-                return "Parar";
             case Estado.Esperando:
+            case Estado.Teleportando:
                 return "Parar";
             case Estado.IndoNodo:
-                return "Andar";
             case Estado.IndoPorta:
                 return "Andar";
             case Estado.Atacando:
@@ -54,6 +56,7 @@ public class Inimigo : MonoBehaviour {
     void Start() {
         rb = GetComponent<Rigidbody>();
         anim = transform.GetChild(0).GetComponent<Animator>();
+        isInimigoInCamera = GetComponent<IsInCamera>();
     }
 
     void FixedUpdate() {
@@ -66,6 +69,9 @@ public class Inimigo : MonoBehaviour {
                 break;
             case Estado.IndoPorta:
                 Walking();
+                break;
+            case Estado.Teleportando:
+                AttemptTeleport();
                 break;
         }
     }
@@ -85,12 +91,6 @@ public class Inimigo : MonoBehaviour {
         }
     }
 
-    void LerpLookAt(Vector3 focus) {
-        Vector3 relativePos = focus - transform.position;
-        Quaternion toRotation = Quaternion.LookRotation(relativePos);
-        transform.rotation = Quaternion.Lerp(transform.rotation, toRotation, velocidade * Time.fixedDeltaTime);
-    }
-
     void Walking() {
         Vector3 waypointPos = waypointAtual.position;
         waypointPos.y = transform.position.y;
@@ -107,6 +107,18 @@ public class Inimigo : MonoBehaviour {
 
             if (waypoints.Count == 0) EndedMovement();
         }
+    }
+
+    void AttemptTeleport() {
+        if (isInimigoInCamera.isInCamera) return;
+        if (isSpawnInCamera.isInCamera) return;
+
+        Vector3 pos = mapeamento.raiz.GetPosition();
+        pos.y = transform.position.y;
+        transform.position = pos;
+        rb.velocity = Vector3.zero;
+
+        ChangeEstado(Estado.Parado);
     }
 
     void GotToNodo() {
@@ -143,11 +155,13 @@ public class Inimigo : MonoBehaviour {
     }
 
     void EndedMovement() {
-        Vector3 pos = mapeamento.raiz.GetPosition();
-        pos.y = transform.position.y;
-        transform.position = pos;
-        rb.velocity = Vector3.zero;
-        ChangeEstado(Estado.Parado);
+        ChangeEstado(Estado.Teleportando);
+    }
+
+    void LerpLookAt(Vector3 focus) {
+        Vector3 relativePos = focus - transform.position;
+        Quaternion toRotation = Quaternion.LookRotation(relativePos);
+        transform.rotation = Quaternion.Lerp(transform.rotation, toRotation, velocidade * Time.fixedDeltaTime);
     }
 
     #region WaypointRelated
