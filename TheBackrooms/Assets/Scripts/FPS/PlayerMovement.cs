@@ -7,6 +7,7 @@ public class PlayerMovement : MonoBehaviour
     CharacterController cc;
 
     public float speed = 12f;
+    public float runningSpeed = 20f;
 
 
     void Start() {
@@ -18,11 +19,16 @@ public class PlayerMovement : MonoBehaviour
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
 
+        float currentSpeed = speed;
+
+        if (Input.GetKey(KeyCode.LeftControl)) {
+            currentSpeed = runningSpeed;
+        }
         
 
         if (x != 0 || z != 0){
             Vector3 move = transform.right * x + transform.forward * z;
-            move = move * speed;
+            move = move * currentSpeed;
             move.y = cc.isGrounded ? 0 : Gravity().y;
             
             cc.Move(move * Time.fixedDeltaTime);

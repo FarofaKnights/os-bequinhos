@@ -9,6 +9,7 @@ public class Inimigo : MonoBehaviour {
 
     public Queue<Transform> waypoints = new Queue<Transform>();
     Transform waypointAtual;
+    public Transform wayportaDesesperado;
 
     public Arvore mapeamento;
 
@@ -103,7 +104,10 @@ public class Inimigo : MonoBehaviour {
 
         if (Vector3.Distance(transform.position, waypointPos) < 0.5f) {
             if (estado == Estado.IndoNodo) GotToNodo();
-            else if (estado == Estado.IndoPorta) StartCoroutine(GotToPorta());
+            else if (estado == Estado.IndoPorta) {
+                wayportaDesesperado = waypointAtual;
+                StartCoroutine(GotToPorta());
+            }
 
             if (waypoints.Count == 0) EndedMovement();
         }
@@ -138,13 +142,12 @@ public class Inimigo : MonoBehaviour {
     IEnumerator GotToPorta() {
         waypointAtual = waypoints.Peek();
         ChangeEstado(Estado.Esperando);
+        rb.velocity = Vector3.zero;
 
         yield return new WaitForSeconds(3);
 
-        /*
-        Porta porta = waypointAtual.parent.GetComponent<Porta>();
+        Porta porta = wayportaDesesperado.parent.GetComponent<Porta>();
         porta.Coletar();
-        */
 
         // Se é o ultimo nodo
         if (waypoints.Count == 1) {

@@ -10,8 +10,11 @@ public class PortalTextureSetup : MonoBehaviour {
     public Material matCameraA;
 
     void Start() {
-        ChangeCamera(cameraB, matCameraB);
-        ChangeCamera(cameraA, matCameraA);
+        if (cameraB != null && matCameraB != null)
+            ChangeCamera(cameraB, matCameraB);
+
+        if (cameraA != null && matCameraA != null)
+            ChangeCamera(cameraA, matCameraA);
     }
 
     void ChangeCamera(Camera cam, Material mat) {

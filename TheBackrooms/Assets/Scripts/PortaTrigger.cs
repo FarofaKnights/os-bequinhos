@@ -20,7 +20,7 @@ public class PortaTrigger : MonoBehaviour {
                 indicador.SetActive(true);
             }
         } else if (other.gameObject.tag == "Inimigo") {
-            porta.Coletar();
+            // porta.Coletar();
         }
     }
 
