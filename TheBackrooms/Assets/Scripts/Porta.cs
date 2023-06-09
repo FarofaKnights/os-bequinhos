@@ -7,6 +7,7 @@ public class Porta : MonoBehaviour {
     [NonSerialized] public Nodo nodo;
     public Transform waypoint;
     public bool coletada = false;
+    public bool disponivel = true;
 
     public GameObject[] ativar;
     public GameObject[] desativar;
@@ -44,5 +45,9 @@ public class Porta : MonoBehaviour {
                 obj.SetActive(false);
             }
         }
+    }
+
+    public void UpdateDisponibilidade(bool disponivel) {
+        this.disponivel = disponivel;
     }
 }

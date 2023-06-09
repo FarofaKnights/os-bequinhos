@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour {
     public static GameManager instance;
@@ -11,6 +12,14 @@ public class GameManager : MonoBehaviour {
     public Nodo raiz;
     public List<Porta> portas = new List<Porta>();
     List<Porta> portasNaoColetadas = new List<Porta>();
+
+    public List<Coletavel> coletados = new List<Coletavel>();
+
+    public GameObject door;
+
+    public Transform inimigoLastPose;
+
+    public bool finalizando = false;
 
     void Awake() {
         instance = this;
@@ -81,10 +90,43 @@ public class GameManager : MonoBehaviour {
         portasNaoColetadas.Remove(porta);
     }
 
-    public int GetDoor() {
-        if (portasNaoColetadas.Count == 0) return -1;
+    public Porta GetDoor() {
+        if (portasNaoColetadas.Count == 0) return null;
 
         int random = Random.Range(0, portasNaoColetadas.Count);
-        return portasNaoColetadas[random].nodo.id;
+        return portasNaoColetadas[random];
+    }
+
+    public void Coletar(Coletavel coletavel) {
+        if (coletados.Contains(coletavel)) return;
+
+        coletados.Add(coletavel);
+
+        if (coletados.Count == 3) {
+            door.SetActive(false);
+        }
+    }
+
+    public void Finalizar() {
+        Inimigo inimigo = Inimigo.instance;
+        inimigo.gameObject.transform.SetParent(inimigoLastPose);
+        inimigo.gameObject.transform.localPosition = Vector3.zero;
+        inimigo.gameObject.transform.localRotation = Quaternion.identity;
+
+        inimigo.ChangeEstado(Inimigo.Estado.Esperando);
+
+        finalizando = true;
+
+        StartCoroutine(FinalizarCoroutine());
+    }
+
+    IEnumerator FinalizarCoroutine() {
+        yield return new WaitForSeconds(3);
+
+        Inimigo.instance.LevarUmTiro();
+
+        yield return new WaitForSeconds(1);
+
+        SceneManager.LoadScene("Menu");
     }
 }

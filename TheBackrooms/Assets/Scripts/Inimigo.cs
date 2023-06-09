@@ -14,16 +14,23 @@ public class Inimigo : MonoBehaviour {
     public Arvore mapeamento;
 
     public enum Estado { IndoNodo, Atacando, Parado, IndoPorta, Esperando, Teleportando };
-    public Estado estado = Estado.Parado;
+    public Estado estado = Estado.Esperando;
 
     IsInCamera isInimigoInCamera;
     public IsInCamera isSpawnInCamera;
+
+    Porta portaAtual;
 
     Animator anim;
 
     public float velocidade = 5;
 
     Rigidbody rb;
+
+    IEnumerator Inicial() {
+        yield return new WaitForSeconds(5);
+        ChangeEstado(Estado.Teleportando);
+    }
 
     public void ChangeEstado(Estado estado) {
         if (this.estado == estado) return;
@@ -58,6 +65,8 @@ public class Inimigo : MonoBehaviour {
         rb = GetComponent<Rigidbody>();
         anim = transform.GetChild(0).GetComponent<Animator>();
         isInimigoInCamera = GetComponent<IsInCamera>();
+
+        StartCoroutine(Inicial());
     }
 
     void FixedUpdate() {
@@ -77,14 +86,21 @@ public class Inimigo : MonoBehaviour {
         }
     }
 
+    bool PortaAindaDisponivel(Porta porta) {
+        return porta != null && !porta.coletada && porta.disponivel;
+    }
+
     public void SearchNodo() {
         if (waypoints.Count == 0) {
-            int random = GameManager.instance.GetDoor();
-            if (random > -1 && mapeamento.Pesquisar(random)) {
+            Porta port = GameManager.instance.GetDoor();
+            portaAtual = port;
+
+            if (port != null && mapeamento.Pesquisar(port.nodo.id) && PortaAindaDisponivel(portaAtual)) {
                 ChangeEstado(Estado.IndoNodo);
                 waypointAtual = waypoints.Peek();
             }
             else {
+                portaAtual = null;
                 waypoints.Clear();
                 view.Clear();
                 ChangeEstado(Estado.Parado);
@@ -110,6 +126,13 @@ public class Inimigo : MonoBehaviour {
             }
 
             if (waypoints.Count == 0) EndedMovement();
+        }
+
+        if (!PortaAindaDisponivel(portaAtual)) {
+            waypoints.Clear();
+            view.Clear();
+
+            EndedMovement();
         }
     }
 
@@ -147,7 +170,8 @@ public class Inimigo : MonoBehaviour {
         yield return new WaitForSeconds(3);
 
         Porta porta = wayportaDesesperado.parent.GetComponent<Porta>();
-        porta.Coletar();
+        if (PortaAindaDisponivel(porta))
+            porta.Coletar();
 
         // Se é o ultimo nodo
         if (waypoints.Count == 1) {
@@ -165,6 +189,10 @@ public class Inimigo : MonoBehaviour {
         Vector3 relativePos = focus - transform.position;
         Quaternion toRotation = Quaternion.LookRotation(relativePos);
         transform.rotation = Quaternion.Lerp(transform.rotation, toRotation, velocidade * Time.fixedDeltaTime);
+    }
+
+    public void LevarUmTiro() {
+        anim.SetTrigger("Empurrar");
     }
 
     #region WaypointRelated
