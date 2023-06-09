@@ -88,6 +88,10 @@ public class GameManager : MonoBehaviour {
     public void ColetarPorta(Porta porta) {
         porta.coletada = true;
         portasNaoColetadas.Remove(porta);
+
+        if (portasNaoColetadas.Count == 0) {
+            Acabar();
+        }
     }
 
     public Porta GetDoor() {
@@ -105,6 +109,10 @@ public class GameManager : MonoBehaviour {
         if (coletados.Count == 3) {
             door.SetActive(false);
         }
+    }
+
+    public void Acabar() {
+        SceneManager.LoadScene("Menu");
     }
 
     public void Finalizar() {
