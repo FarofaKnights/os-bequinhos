@@ -31,6 +31,8 @@ public class GameManager : MonoBehaviour {
         // Gera arvore de mapeamento do inimigo
         GeraPosicao(raiz);
         ValorParaArvore(raiz, Inimigo.instance.mapeamento);
+
+        Despausar();
     }
 
     void Update() {
@@ -89,7 +91,7 @@ public class GameManager : MonoBehaviour {
         porta.coletada = true;
         portasNaoColetadas.Remove(porta);
 
-        if (portasNaoColetadas.Count == 0) {
+        if (portasNaoColetadas.Count == 0 && !finalizando) {
             Acabar();
         }
     }
@@ -112,6 +114,9 @@ public class GameManager : MonoBehaviour {
     }
 
     public void Acabar() {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        Time.timeScale = 1;
         SceneManager.LoadScene("Menu");
     }
 
@@ -120,6 +125,7 @@ public class GameManager : MonoBehaviour {
         inimigo.gameObject.transform.SetParent(inimigoLastPose);
         inimigo.gameObject.transform.localPosition = Vector3.zero;
         inimigo.gameObject.transform.localRotation = Quaternion.identity;
+        inimigo.GetComponent<Rigidbody>().isKinematic = true;
 
         inimigo.ChangeEstado(Inimigo.Estado.Esperando);
 

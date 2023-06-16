@@ -172,6 +172,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   waypoint: {fileID: 0}
   coletada: 0
+  disponivel: 1
+  ativar: []
+  desativar: []
 --- !u!1 &186225853
 GameObject:
   m_ObjectHideFlags: 0
@@ -771,7 +774,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc1c6aa3b2f345843897f54fe99016c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  indicador: {fileID: 0}
 --- !u!65 &405217743
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1524,6 +1526,7 @@ GameObject:
   m_Component:
   - component: {fileID: 846375609}
   - component: {fileID: 846375608}
+  - component: {fileID: 846375610}
   - component: {fileID: 846375607}
   - component: {fileID: 846375606}
   m_Layer: 0
@@ -1624,14 +1627,26 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 846375605}
-  m_LocalRotation: {x: 0.2588191, y: 0, z: 0, w: 0.9659258}
-  m_LocalPosition: {x: 0, y: 3.91, z: 7.5}
+  m_LocalRotation: {x: 0.5, y: 0, z: 0, w: 0.8660254}
+  m_LocalPosition: {x: 0, y: 28.8, z: -20.29}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 30, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 60, y: 0, z: 0}
+--- !u!114 &846375610
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 846375605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b057ea6bfb5d41b448707a329d4f860c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &969452298
 GameObject:
   m_ObjectHideFlags: 0
@@ -2633,6 +2648,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1452389170}
   - component: {fileID: 1452389169}
+  - component: {fileID: 1452389171}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -2653,15 +2669,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   raiz: {fileID: 648651186}
-  portas:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  portas: []
+  coletados: []
+  door: {fileID: 0}
+  inimigoLastPose: {fileID: 0}
+  finalizando: 0
 --- !u!4 &1452389170
 Transform:
   m_ObjectHideFlags: 0
@@ -2677,6 +2689,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1452389171
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1452389168}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d96b00453a5234c43b42ea71b31d9e5e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canMenu: 1
 --- !u!1 &1453572478
 GameObject:
   m_ObjectHideFlags: 0
@@ -2934,7 +2959,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc1c6aa3b2f345843897f54fe99016c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  indicador: {fileID: 0}
 --- !u!65 &1573003579
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3144,6 +3168,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   waypoint: {fileID: 0}
   coletada: 0
+  disponivel: 1
+  ativar: []
+  desativar: []
 --- !u!1 &1706839284
 GameObject:
   m_ObjectHideFlags: 0
@@ -3726,7 +3753,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc1c6aa3b2f345843897f54fe99016c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  indicador: {fileID: 0}
 --- !u!65 &1979251520
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3839,6 +3865,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   waypoint: {fileID: 0}
   coletada: 0
+  disponivel: 1
+  ativar: []
+  desativar: []
 --- !u!1 &2034913099
 GameObject:
   m_ObjectHideFlags: 0

@@ -86,6 +86,12 @@ public class Inimigo : MonoBehaviour {
         }
     }
 
+    void OnCollisionEnter(Collision other) {
+        if (other.gameObject.CompareTag("Player")) {
+            GameManager.instance.Acabar();
+        }
+    }
+
     bool PortaAindaDisponivel(Porta porta) {
         return porta != null && !porta.coletada && porta.disponivel;
     }
